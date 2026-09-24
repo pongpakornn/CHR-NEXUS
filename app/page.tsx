@@ -34,6 +34,7 @@ import {
   Wrench,
   X,
 } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, Legend, Line, LineChart as RechartsLineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const navigation = [
   { label: "Dashboard", icon: LayoutDashboard, active: true },
@@ -74,6 +75,22 @@ const orders = [
 const maintenance = [
   { machine: "Stamping machine ST-04", task: "Hydraulic pressure inspection", time: "Today · 13:30", priority: "High" },
   { machine: "Robot arm RB-12", task: "Scheduled lubrication", time: "Tomorrow · 09:00", priority: "Normal" },
+];
+
+const trendData = [
+  { day: "18 Sep", forecast: 3600, actual: 3420, delivery: 88 },
+  { day: "19 Sep", forecast: 4100, actual: 3980, delivery: 91 },
+  { day: "20 Sep", forecast: 3900, actual: 4250, delivery: 94 },
+  { day: "21 Sep", forecast: 4700, actual: 4520, delivery: 92 },
+  { day: "22 Sep", forecast: 5200, actual: 4980, delivery: 96 },
+  { day: "23 Sep", forecast: 5100, actual: 5260, delivery: 94 },
+  { day: "24 Sep", forecast: 5600, actual: 5480, delivery: 98 },
+];
+
+const deliveryData = [
+  { name: "On time", value: 78, color: "#d8a64e" },
+  { name: "At risk", value: 14, color: "#f59e0b" },
+  { name: "Delayed", value: 8, color: "#e11d48" },
 ];
 
 export default function Home() {
@@ -148,8 +165,20 @@ export default function Home() {
                 <article className="nexus-card nexus-enter rounded-xl border border-slate-200/80 bg-[#272c33] p-5 text-white shadow-[0_2px_8px_rgba(30,40,50,0.03)]" style={{ animationDelay: "580ms" }}><div className="flex items-start justify-between"><div><p className="text-sm font-bold">Today&apos;s timeline</p><p className="mt-1 text-xs text-slate-400">Key events across the floor</p></div><CalendarClock className="size-5 text-[#d8a64e]" /></div><div className="mt-5 flex flex-col gap-4">{[["08:00", "Shift started", "Production floor opened"], ["12:00", "Lunch break", "All lines paused"], ["15:30", "Dispatch window", "12 orders queued"]].map(([time, title, detail], index) => <div key={time} className="flex gap-3"><div className="flex w-11 shrink-0 flex-col items-center"><span className={`size-2.5 rounded-full ${index === 0 ? "nexus-pulse bg-[#d8a64e]" : "bg-slate-600"}`} /><span className="mt-1 text-[10px] text-slate-500">{time}</span></div><div className="border-l border-slate-700 pb-1 pl-4"><p className="text-xs font-semibold text-slate-200">{title}</p><p className="mt-1 text-[10px] text-slate-500">{detail}</p></div></div>)}</div></article>
               </div>
 
+              <div className="mt-6 grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+                <article className="nexus-card nexus-enter rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(30,40,50,0.03)]" style={{ animationDelay: "620ms" }}>
+                  <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-sm font-bold text-slate-800">Forecast vs actual output</p><p className="mt-1 text-xs text-slate-400">Production volume and dispatch reliability · last 7 days</p></div><div className="rounded-lg bg-slate-50 px-3 py-2 text-right"><p className="text-[10px] text-slate-400">Today&apos;s output</p><p className="text-sm font-bold text-slate-800">5,480 <span className="text-[10px] font-medium text-emerald-600">+7.2%</span></p></div></div>
+                  <div className="mt-5 h-[240px] w-full"><ResponsiveContainer width="100%" height="100%"><AreaChart data={trendData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}><defs><linearGradient id="actualFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#d8a64e" stopOpacity={0.28} /><stop offset="100%" stopColor="#d8a64e" stopOpacity={0} /></linearGradient></defs><CartesianGrid vertical={false} stroke="#eef1f4" /><XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "#94a3b8" }} /><YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "#94a3b8" }} /><Tooltip contentStyle={{ borderRadius: 10, border: "1px solid #e2e8f0", fontSize: 11 }} /><Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: 10, paddingBottom: 12 }} /><Area type="monotone" dataKey="actual" name="Actual output" stroke="#d8a64e" strokeWidth={2.5} fill="url(#actualFill)" /><Line type="monotone" dataKey="forecast" name="Forecast" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="5 5" dot={false} /></AreaChart></ResponsiveContainer></div>
+                </article>
+                <article className="nexus-card nexus-enter rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(30,40,50,0.03)]" style={{ animationDelay: "680ms" }}>
+                  <div className="flex items-start justify-between"><div><p className="text-sm font-bold text-slate-800">Delivery health</p><p className="mt-1 text-xs text-slate-400">Order commitment status</p></div><Truck className="size-5 text-[#a2782f]" /></div>
+                  <div className="mt-7 flex items-center justify-center"><div className="relative flex size-36 items-center justify-center rounded-full" style={{ background: "conic-gradient(#d8a64e 0 78%, #f59e0b 78% 92%, #e11d48 92% 100%)" }}><div className="flex size-24 flex-col items-center justify-center rounded-full bg-white"><span className="text-2xl font-bold text-slate-800">78%</span><span className="text-[10px] text-slate-400">on time</span></div></div></div>
+                  <div className="mt-7 flex flex-col gap-3">{deliveryData.map((item) => <div key={item.name} className="flex items-center justify-between text-xs"><span className="flex items-center gap-2 text-slate-500"><span className="size-2 rounded-full" style={{ backgroundColor: item.color }} />{item.name}</span><span className="font-bold text-slate-700">{item.value}%</span></div>)}</div>
+                </article>
+              </div>
+
               <div className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-                <article className="nexus-card nexus-enter rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(30,40,50,0.03)]" style={{ animationDelay: "640ms" }}><div className="flex items-start justify-between"><div><p className="text-sm font-bold text-slate-800">Order progress</p><p className="mt-1 text-xs text-slate-400">Priority orders needing visibility</p></div><LineChart className="size-5 text-[#a2782f]" /></div><div className="mt-5 flex flex-col gap-4">{orders.map((order) => <div key={order.id} className="rounded-lg border border-slate-100 p-3 transition hover:border-[#ead6a9]"><div className="flex flex-wrap items-center justify-between gap-2"><div><span className="text-[10px] font-bold text-[#a2782f]">{order.id}</span><p className="mt-1 text-xs font-semibold text-slate-700">{order.customer}</p></div><span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${order.progress === 100 ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>{order.status}</span></div><div className="mt-3 flex items-center gap-3"><div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-[#d8a64e]" style={{ width: `${order.progress}%` }} /></div><span className="text-[10px] font-semibold text-slate-500">{order.progress}%</span><span className="hidden text-[10px] text-slate-400 sm:block">Due {order.due}</span></div></div>)}</div></article>
+                <article className="nexus-card nexus-enter rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(30,40,50,0.03)]" style={{ animationDelay: "740ms" }}><div className="flex items-start justify-between"><div><p className="text-sm font-bold text-slate-800">Order progress</p><p className="mt-1 text-xs text-slate-400">Priority orders needing visibility</p></div><LineChart className="size-5 text-[#a2782f]" /></div><div className="mt-5 flex flex-col gap-4">{orders.map((order) => <div key={order.id} className="rounded-lg border border-slate-100 p-3 transition hover:border-[#ead6a9]"><div className="flex flex-wrap items-center justify-between gap-2"><div><span className="text-[10px] font-bold text-[#a2782f]">{order.id}</span><p className="mt-1 text-xs font-semibold text-slate-700">{order.customer}</p></div><span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${order.progress === 100 ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>{order.status}</span></div><div className="mt-3 flex items-center gap-3"><div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-[#d8a64e]" style={{ width: `${order.progress}%` }} /></div><span className="text-[10px] font-semibold text-slate-500">{order.progress}%</span><span className="hidden text-[10px] text-slate-400 sm:block">Due {order.due}</span></div></div>)}</div></article>
                 <article className="nexus-card nexus-enter rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(30,40,50,0.03)]" style={{ animationDelay: "700ms" }}><div className="flex items-start justify-between"><div><p className="text-sm font-bold text-slate-800">Maintenance queue</p><p className="mt-1 text-xs text-slate-400">Keep critical equipment healthy</p></div><Hammer className="size-5 text-rose-500" /></div><div className="mt-5 flex flex-col gap-3">{maintenance.map((item) => <div key={item.machine} className="flex gap-3 rounded-lg bg-slate-50 p-3"><div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-rose-500 shadow-sm"><Wrench className="size-4" /></div><div className="min-w-0 flex-1"><div className="flex items-center justify-between gap-2"><p className="truncate text-xs font-semibold text-slate-700">{item.machine}</p><span className={`text-[10px] font-bold ${item.priority === "High" ? "text-rose-600" : "text-slate-400"}`}>{item.priority}</span></div><p className="mt-1 truncate text-[10px] text-slate-400">{item.task}</p><p className="mt-2 flex items-center gap-1 text-[10px] font-medium text-[#a2782f]"><Timer className="size-3" />{item.time}</p></div></div>)}</div><button className="mt-4 flex items-center gap-2 text-[11px] font-semibold text-[#a2782f] hover:underline"><CircleCheck className="size-3.5" /> View maintenance plan</button></article>
               </div>
 
