@@ -60,7 +60,15 @@ button { cursor: pointer; }
 .nexus-progress { animation: nexus-progress-in 900ms cubic-bezier(.22, 1, .36, 1) both; transform-origin: left; }
 .nexus-pulse { animation: nexus-pulse 2.4s ease-in-out infinite; }
 .nexus-card { transition: transform 280ms cubic-bezier(.22, 1, .36, 1), box-shadow 280ms ease, border-color 280ms ease; }
-.nexus-card:hover { transform: translateY(-4px); box-shadow: 0 16px 35px rgba(30, 40, 50, 0.09); border-color: rgba(216, 166, 78, 0.38); }
+.nexus-card:hover { transform: translateY(-5px) rotateX(0.5deg); box-shadow: 0 18px 38px rgba(30, 40, 50, 0.11); border-color: rgba(216, 166, 78, 0.38); }
+.nexus-3d { transform-style: preserve-3d; perspective: 900px; }
+.nexus-3d::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: linear-gradient(120deg, rgba(255,255,255,.18), transparent 38%); opacity: 0; transition: opacity 300ms ease; }
+.nexus-3d:hover::after { opacity: 1; }
+.nexus-glow { box-shadow: 0 0 0 1px rgba(216,166,78,.08), 0 0 34px rgba(91,141,239,.08); }
+.nexus-live { animation: nexus-live 2s ease-in-out infinite; }
+@keyframes nexus-live { 50% { opacity: .55; transform: scale(.82); } }
+.nexus-modal { animation: nexus-modal-in 300ms cubic-bezier(.22,1,.36,1) both; }
+@keyframes nexus-modal-in { from { opacity: 0; transform: translateY(16px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
