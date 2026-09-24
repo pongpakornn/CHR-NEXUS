@@ -2,16 +2,21 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  Activity,
   Bell,
   Bot,
   Box,
-  ChevronDown,
+  CalendarClock,
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  CircleCheck,
   FileSpreadsheet,
   Gauge,
   GripVertical,
+  Hammer,
+  LineChart,
+  Timer,
   HelpCircle,
   LayoutDashboard,
   LogOut,
@@ -19,7 +24,6 @@ import {
   MessageSquareText,
   MoreHorizontal,
   PackageCheck,
-  PanelRight,
   Search,
   Settings,
   ShieldCheck,
@@ -55,19 +59,35 @@ const activity = [
   { title: "New import processed", description: "Packing schedule · 24 rows", time: "Yesterday", tone: "amber" },
 ];
 
+const productionLines = [
+  { name: "Press line 01", value: 92, target: "1,240 units", status: "On target", color: "bg-emerald-500" },
+  { name: "Press line 02", value: 78, target: "980 units", status: "Watching", color: "bg-amber-500" },
+  { name: "Assembly line 03", value: 96, target: "1,420 units", status: "On target", color: "bg-emerald-500" },
+];
+
+const orders = [
+  { id: "ORD-4821", customer: "Mitsuda Automotive", due: "Today, 16:00", progress: 86, status: "In production" },
+  { id: "ORD-4814", customer: "Siam Components", due: "Tomorrow, 09:30", progress: 58, status: "Material check" },
+  { id: "ORD-4798", customer: "Koyo Industrial", due: "24 Sep, 14:00", progress: 100, status: "Ready to ship" },
+];
+
+const maintenance = [
+  { machine: "Stamping machine ST-04", task: "Hydraulic pressure inspection", time: "Today · 13:30", priority: "High" },
+  { machine: "Robot arm RB-12", task: "Scheduled lubrication", time: "Tomorrow · 09:00", priority: "Normal" },
+];
+
 export default function Home() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState(() => {
+    if (typeof window === "undefined") return { x: 0, y: 0 };
+    const saved = window.localStorage.getItem("chr-nexus-profile-position");
+    return saved ? JSON.parse(saved) : { x: 0, y: 0 };
+  });
   const [dragging, setDragging] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem("chr-nexus-profile-position");
-    if (saved) setPosition(JSON.parse(saved));
-  }, []);
 
   useEffect(() => {
     if (!dragging) window.localStorage.setItem("chr-nexus-profile-position", JSON.stringify(position));
@@ -119,6 +139,20 @@ export default function Home() {
                 <article className="nexus-card nexus-enter rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(30,40,50,0.03)]" style={{ animationDelay: "340ms" }}><div className="flex items-start justify-between"><div><p className="text-sm font-bold text-slate-800">Production activity</p><p className="mt-1 text-xs text-slate-400">Live updates from your production floor</p></div><button className="rounded-lg p-2 text-slate-400 hover:bg-slate-50" aria-label="Activity options"><MoreHorizontal className="size-5" /></button></div><div className="mt-6 flex h-44 items-end gap-2 border-b border-slate-100 px-1 sm:gap-4">{[42, 58, 51, 75, 64, 82, 70, 91, 78, 88, 80, 96].map((height, index) => <div key={index} className="group flex flex-1 flex-col items-center gap-2"><div className={`nexus-bar w-full max-w-8 rounded-t-sm transition group-hover:bg-[#c9983f] ${index === 11 ? "bg-[#d8a64e]" : "bg-slate-200"}`} style={{ height: `${height}%`, animationDelay: `${index * 55 + 420}ms` }} /><span className="text-[9px] text-slate-400">{["08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"][index]}</span></div>)}</div><div className="mt-4 flex items-center justify-between text-[11px] text-slate-400"><span>Units processed</span><span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-[#d8a64e]" />Current shift</span></div></article>
                 <article className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(30,40,50,0.03)]"><div className="flex items-start justify-between"><div><p className="text-sm font-bold text-slate-800">Recent activity</p><p className="mt-1 text-xs text-slate-400">Your team&apos;s latest actions</p></div><button className="text-xs font-semibold text-[#a2782f] hover:underline">View all</button></div><div className="mt-5 flex flex-col gap-5">{activity.map((item) => <div key={item.title} className="flex items-start gap-3"><div className={`mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full ${item.tone === "blue" ? "bg-blue-50 text-blue-600" : item.tone === "green" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}><div className="size-1.5 rounded-full bg-current" /></div><div className="min-w-0 flex-1"><p className="text-xs font-semibold text-slate-700">{item.title}</p><p className="mt-1 truncate text-[11px] text-slate-400">{item.description}</p></div><span className="text-[10px] text-slate-400">{item.time}</span></div>)}</div></article>
               </div>
+              <div className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+                <article className="nexus-card nexus-enter rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(30,40,50,0.03)]" style={{ animationDelay: "520ms" }}>
+                  <div className="flex items-start justify-between"><div><p className="text-sm font-bold text-slate-800">Line efficiency</p><p className="mt-1 text-xs text-slate-400">Performance against today&apos;s production target</p></div><div className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700"><Activity className="size-3.5" /> Live</div></div>
+                  <div className="mt-5 flex flex-col gap-4">{productionLines.map((line) => <div key={line.name}><div className="mb-2 flex items-center justify-between gap-3 text-xs"><span className="font-semibold text-slate-700">{line.name}</span><span className="text-slate-400">{line.target}</span></div><div className="flex items-center gap-3"><div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100"><div className={`nexus-progress h-full rounded-full ${line.color}`} style={{ width: `${line.value}%` }} /></div><span className="w-9 text-right text-xs font-bold text-slate-700">{line.value}%</span><span className={`hidden w-20 text-right text-[10px] font-semibold sm:block ${line.value > 85 ? "text-emerald-600" : "text-amber-600"}`}>{line.status}</span></div></div>)}</div>
+                  <div className="mt-5 grid grid-cols-3 gap-3 border-t border-slate-100 pt-4"><div><p className="text-[10px] text-slate-400">OEE score</p><p className="mt-1 text-lg font-bold text-slate-800">88.4%</p></div><div><p className="text-[10px] text-slate-400">Downtime</p><p className="mt-1 text-lg font-bold text-slate-800">42 min</p></div><div><p className="text-[10px] text-slate-400">Shift target</p><p className="mt-1 text-lg font-bold text-slate-800">4,820</p></div></div>
+                </article>
+                <article className="nexus-card nexus-enter rounded-xl border border-slate-200/80 bg-[#272c33] p-5 text-white shadow-[0_2px_8px_rgba(30,40,50,0.03)]" style={{ animationDelay: "580ms" }}><div className="flex items-start justify-between"><div><p className="text-sm font-bold">Today&apos;s timeline</p><p className="mt-1 text-xs text-slate-400">Key events across the floor</p></div><CalendarClock className="size-5 text-[#d8a64e]" /></div><div className="mt-5 flex flex-col gap-4">{[["08:00", "Shift started", "Production floor opened"], ["12:00", "Lunch break", "All lines paused"], ["15:30", "Dispatch window", "12 orders queued"]].map(([time, title, detail], index) => <div key={time} className="flex gap-3"><div className="flex w-11 shrink-0 flex-col items-center"><span className={`size-2.5 rounded-full ${index === 0 ? "nexus-pulse bg-[#d8a64e]" : "bg-slate-600"}`} /><span className="mt-1 text-[10px] text-slate-500">{time}</span></div><div className="border-l border-slate-700 pb-1 pl-4"><p className="text-xs font-semibold text-slate-200">{title}</p><p className="mt-1 text-[10px] text-slate-500">{detail}</p></div></div>)}</div></article>
+              </div>
+
+              <div className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+                <article className="nexus-card nexus-enter rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(30,40,50,0.03)]" style={{ animationDelay: "640ms" }}><div className="flex items-start justify-between"><div><p className="text-sm font-bold text-slate-800">Order progress</p><p className="mt-1 text-xs text-slate-400">Priority orders needing visibility</p></div><LineChart className="size-5 text-[#a2782f]" /></div><div className="mt-5 flex flex-col gap-4">{orders.map((order) => <div key={order.id} className="rounded-lg border border-slate-100 p-3 transition hover:border-[#ead6a9]"><div className="flex flex-wrap items-center justify-between gap-2"><div><span className="text-[10px] font-bold text-[#a2782f]">{order.id}</span><p className="mt-1 text-xs font-semibold text-slate-700">{order.customer}</p></div><span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${order.progress === 100 ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>{order.status}</span></div><div className="mt-3 flex items-center gap-3"><div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-[#d8a64e]" style={{ width: `${order.progress}%` }} /></div><span className="text-[10px] font-semibold text-slate-500">{order.progress}%</span><span className="hidden text-[10px] text-slate-400 sm:block">Due {order.due}</span></div></div>)}</div></article>
+                <article className="nexus-card nexus-enter rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(30,40,50,0.03)]" style={{ animationDelay: "700ms" }}><div className="flex items-start justify-between"><div><p className="text-sm font-bold text-slate-800">Maintenance queue</p><p className="mt-1 text-xs text-slate-400">Keep critical equipment healthy</p></div><Hammer className="size-5 text-rose-500" /></div><div className="mt-5 flex flex-col gap-3">{maintenance.map((item) => <div key={item.machine} className="flex gap-3 rounded-lg bg-slate-50 p-3"><div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-rose-500 shadow-sm"><Wrench className="size-4" /></div><div className="min-w-0 flex-1"><div className="flex items-center justify-between gap-2"><p className="truncate text-xs font-semibold text-slate-700">{item.machine}</p><span className={`text-[10px] font-bold ${item.priority === "High" ? "text-rose-600" : "text-slate-400"}`}>{item.priority}</span></div><p className="mt-1 truncate text-[10px] text-slate-400">{item.task}</p><p className="mt-2 flex items-center gap-1 text-[10px] font-medium text-[#a2782f]"><Timer className="size-3" />{item.time}</p></div></div>)}</div><button className="mt-4 flex items-center gap-2 text-[11px] font-semibold text-[#a2782f] hover:underline"><CircleCheck className="size-3.5" /> View maintenance plan</button></article>
+              </div>
+
               <div className="mt-6 rounded-xl border border-[#eadfc9] bg-[#fffaf0] p-4 sm:flex sm:items-center sm:justify-between"><div className="flex items-center gap-3"><div className="flex size-9 items-center justify-center rounded-lg bg-[#f4e6c8] text-[#a2782f]"><HelpCircle className="size-[18px]" /></div><div><p className="text-xs font-bold text-slate-700">Need help with your workflow?</p><p className="mt-0.5 text-[11px] text-slate-500">Ask the AI assistant to find data or guide your next action.</p></div></div><button onClick={() => setChatOpen(true)} className="mt-3 rounded-lg bg-[#272c33] px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700 sm:mt-0">Open assistant</button></div>
             </div>
           </div>
