@@ -28,3 +28,34 @@ button, input { font: inherit; }
 button { cursor: pointer; }
 
 ::selection { background: #ead6a9; color: #272c33; }
+
+@keyframes nexus-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes nexus-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes nexus-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(216, 166, 78, 0.18); }
+  50% { box-shadow: 0 0 0 8px rgba(216, 166, 78, 0); }
+}
+
+@keyframes nexus-bar-rise {
+  from { opacity: 0; transform: scaleY(0); transform-origin: bottom; }
+  to { opacity: 1; transform: scaleY(1); transform-origin: bottom; }
+}
+
+.nexus-enter { animation: nexus-fade-up 650ms cubic-bezier(.22, 1, .36, 1) both; }
+.nexus-enter-soft { animation: nexus-fade-in 500ms ease-out both; }
+.nexus-bar { animation: nexus-bar-rise 700ms cubic-bezier(.22, 1, .36, 1) both; }
+.nexus-pulse { animation: nexus-pulse 2.4s ease-in-out infinite; }
+.nexus-card { transition: transform 280ms cubic-bezier(.22, 1, .36, 1), box-shadow 280ms ease, border-color 280ms ease; }
+.nexus-card:hover { transform: translateY(-4px); box-shadow: 0 16px 35px rgba(30, 40, 50, 0.09); border-color: rgba(216, 166, 78, 0.38); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}
